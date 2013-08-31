@@ -30,7 +30,6 @@ class ElevationModel():
         '''Use the Geoscience Australia database instead - watch for the correct database path'''
         if self.database == 'geoscience':
             self.mappy = GAreader.ERMap()
-            self.mappy.read_ermapper(os.path.join(os.environ['HOME'], './Documents/Elevation/Canberra/GSNSW_P756demg'))
 
     def GetElevation(self, latitude, longitude):
         '''Returns the altitude (m ASL) of a given lat/long pair'''
