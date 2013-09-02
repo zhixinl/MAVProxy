@@ -659,6 +659,7 @@ class MPSlipMapPanel(wx.Panel):
         self.last_click_pos = None
         if state.elevation:
             self.ElevationMap = mp_elevation.ElevationModel()
+            self.ElevationMap_GA = mp_elevation.ElevationModel(database='geoscience')
 
         self.mainSizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.mainSizer)
@@ -768,7 +769,8 @@ class MPSlipMapPanel(wx.Panel):
             newtext += 'Cursor: %f %f (%s)' % (lat, lon, mp_util.latlon_to_grid((lat, lon)))
             if state.elevation:
                 alt = self.ElevationMap.GetElevation(lat, lon)
-                newtext += ' %.1fm' % alt
+                alt_GA = self.ElevationMap_GA.GetElevation(lat, lon)
+                newtext += ' %.1fm %.1fm' % (alt, alt_GA)
         pending = state.mt.tiles_pending()
         if pending:
             newtext += ' Map Downloading %u ' % pending
