@@ -12,6 +12,9 @@ import sys
 from pymavlink import mavutil
 import errno
 import time
+import sdk
+import pdb
+
 
 from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
@@ -30,23 +33,42 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
+        # connect falcon sdk
+        try:
+            print "create sdk vehicle"
+            self.vehicle = sdk.Vehicle()
+            # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
+            print "Connecting to Navigation Services @127.0.0.1:3000 ...\n"
+            pdb.set_trace()
+            self.vehicle.createConnection("127.0.0.1", 3000)
+            # self.vehicle.createConnection(serviceHost, servicePort)
+        except:
+            print "Failed to connect sdk"
+
+
+        # add command
+
         self.FalconHILModule_settings = mp_settings.MPSettings(
             [ ('verbose', bool, False),
           ])
-        self.add_command('falcon', self.cmd_falcon, "FalconHILModule module", ['status','set (LOGSETTING)'])
+        self.add_command('falcon', self.cmd_falcon, "falcon commands", ['status','set (LOGSETTING)', 'readsystem'])
 
     def usage(self):
         '''show help on command line options'''
-        return "Usage: FalconHILModule <status|set>"
+        return "Usage: falcon <status|set|readsystem>"
 
-    def cmd_falcone(self, args):
+    def cmd_falcon(self, args):
         '''control behaviour of the module'''
         if len(args) == 0:
             print self.usage()
         elif args[0] == "status":
             print self.status()
         elif args[0] == "set":
+            self.say("call set command with arg %s" % (args[1]))
             self.FalconHILModule_settings.command(args[1:])
+        elif args[0] == "readsystem":
+            self.say("call read system info command")
+            dsi = self.vehicle.droneSystemInfo().getSystemInfo()
         else:
             print self.usage()
 
