@@ -18,10 +18,10 @@ from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
 
-class FalconHIL(mp_module.MPModule):
+class FalconHILModule(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
-        super(FalconHIL, self).__init__(mpstate, "FalconHIL", "Falcon 8+ HIL")
+        super(FalconHILModule, self).__init__(mpstate, "falconhil", "Falcon 8+ HIL")
         self.status_callcount = 0
         self.boredom_interval = 10 # seconds
         self.last_bored = time.time()
@@ -30,23 +30,23 @@ class FalconHIL(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
-        self.FalconHIL_settings = mp_settings.MPSettings(
+        self.FalconHILModule_settings = mp_settings.MPSettings(
             [ ('verbose', bool, False),
           ])
-        self.add_command('FalconHIL', self.cmd_FalconHIL, "FalconHIL module", ['status','set (LOGSETTING)'])
+        self.add_command('falcon', self.cmd_falcon, "FalconHILModule module", ['status','set (LOGSETTING)'])
 
     def usage(self):
         '''show help on command line options'''
-        return "Usage: FalconHIL <status|set>"
+        return "Usage: FalconHILModule <status|set>"
 
-    def cmd_FalconHIL(self, args):
+    def cmd_falcone(self, args):
         '''control behaviour of the module'''
         if len(args) == 0:
             print self.usage()
         elif args[0] == "status":
             print self.status()
         elif args[0] == "set":
-            self.FalconHIL_settings.command(args[1:])
+            self.FalconHILModule_settings.command(args[1:])
         else:
             print self.usage()
 
@@ -61,7 +61,7 @@ class FalconHIL(mp_module.MPModule):
                })
 
     def boredom_message(self):
-        if self.FalconHIL_settings.verbose:
+        if self.FalconHILModule_settings.verbose:
             return ("I'm very bored")
         return ("I'm bored")
 
@@ -86,4 +86,4 @@ class FalconHIL(mp_module.MPModule):
 
 def init(mpstate):
     '''initialise module'''
-    return FalconHIL(mpstate)
+    return FalconHILModule(mpstate)
