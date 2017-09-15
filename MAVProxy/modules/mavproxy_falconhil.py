@@ -39,8 +39,8 @@ class FalconHILModule(mp_module.MPModule):
             self.vehicle = sdk.Vehicle()
             # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
             print "Connecting to Navigation Services @127.0.0.1:3000 ...\n"
-            pdb.set_trace()
-            self.vehicle.createConnection("127.0.0.1", 3000)
+            # pdb.set_trace()
+            # self.vehicle.createConnection("127.0.0.1", 3000)
             # self.vehicle.createConnection(serviceHost, servicePort)
         except:
             print "Failed to connect sdk"
@@ -68,7 +68,7 @@ class FalconHILModule(mp_module.MPModule):
             self.FalconHILModule_settings.command(args[1:])
         elif args[0] == "readsystem":
             self.say("call read system info command")
-            dsi = self.vehicle.droneSystemInfo().getSystemInfo()
+            # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
         else:
             print self.usage()
 
