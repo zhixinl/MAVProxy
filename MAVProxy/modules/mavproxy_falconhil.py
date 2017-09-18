@@ -68,6 +68,8 @@ class FalconHILModule(mp_module.MPModule):
             self.FalconHILModule_settings.command(args[1:])
         elif args[0] == "readsystem":
             self.say("call read system info command")
+            print "call readsystem command - print"
+            self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln")
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
         else:
             print self.usage()
