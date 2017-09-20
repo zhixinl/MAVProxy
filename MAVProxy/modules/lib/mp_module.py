@@ -21,6 +21,8 @@ class MPModule(object):
         if public:
             mpstate.public_modules[name] = self
 
+        self.listen_hil = False
+
     #
     # Overridable hooks follow...
     #
@@ -36,6 +38,9 @@ class MPModule(object):
         return False
 
     def mavlink_packet(self, packet):
+        pass
+
+    def hil_packet(self, packet):
         pass
 
     #

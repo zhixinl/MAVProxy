@@ -461,6 +461,11 @@ class LinkModule(mp_module.MPModule):
             for (mod,pm) in self.mpstate.modules:
                 if not hasattr(mod, 'mavlink_packet'):
                     continue
+
+                # TODO fix this hardcode
+                if mod.name is 'map':
+                    # print("not send mavlink packet to map")
+                    continue
                 try:
                     mod.mavlink_packet(m)
                 except Exception as msg:

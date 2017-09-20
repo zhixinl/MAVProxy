@@ -59,6 +59,9 @@ class FalconHILModule(mp_module.MPModule):
 
     def cmd_falcon(self, args):
         '''control behaviour of the module'''
+        self.say("enter cmd_falcon")
+        print("enter cmd_falcon - print")
+        self.mpstate.console.writeln("enter cmd_falcon - mpstate.console.writeln")
         if len(args) == 0:
             print self.usage()
         elif args[0] == "status":
@@ -67,10 +70,20 @@ class FalconHILModule(mp_module.MPModule):
             self.say("call set command with arg %s" % (args[1]))
             self.FalconHILModule_settings.command(args[1:])
         elif args[0] == "readsystem":
-            self.say("call read system info command")
-            print "call readsystem command - print"
-            self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln")
+            self.say("call read system info command") #goto gui-console
+            print "call readsystem command - print" # goto console
+            self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln") #goto gui-console
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
+
+            # pass to modules
+            for (mod, pm) in self.mpstate.modules:
+                if not hasattr(mod, 'hil_packet'):
+                    continue
+                # try:
+                mod.hil_packet("hello from hil")
+                # except Exception as msg:
+
+
         else:
             print self.usage()
 

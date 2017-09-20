@@ -41,6 +41,7 @@ class MapModule(mp_module.MPModule):
         self.ElevationMap = mp_elevation.ElevationModel()
         self.last_unload_check_time = time.time()
         self.unload_check_interval = 0.1 # seconds
+        self.listen_hil = True
         self.map_settings = mp_settings.MPSettings(
             [ ('showgpspos', int, 0),
               ('showgps2pos', int, 1),
@@ -103,6 +104,9 @@ class MapModule(mp_module.MPModule):
         self.default_popup.add(menu)
         self.mpstate.map.add_object(mp_slipmap.SlipDefaultPopup(self.default_popup, combine=True))
 
+    def hil_packet(self, packet):
+        print("enter map::@@@@@@@@@@@@hil_packet")
+        self.mavlink_packet(packet)
 
     def show_position(self):
         '''show map position click information'''
@@ -459,6 +463,8 @@ class MapModule(mp_module.MPModule):
         self.mpstate.map.set_position('VehiclePos2', (lat, lon), rotation=heading)
 
     def mavlink_packet(self, m):
+        print("enter map::@@@@@@@@@@@@ mavlink_packet")
+
         '''handle an incoming mavlink packet'''
         from MAVProxy.modules.mavproxy_map import mp_slipmap
         if m.get_type() == "HEARTBEAT":
