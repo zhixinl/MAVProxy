@@ -14,6 +14,7 @@ import errno
 import time
 import sdk
 import pdb
+import threading
 
 
 from MAVProxy.modules.lib import mp_module
@@ -42,6 +43,10 @@ class FalconHILModule(mp_module.MPModule):
             # pdb.set_trace()
             # self.vehicle.createConnection("127.0.0.1", 3000)
             # self.vehicle.createConnection(serviceHost, servicePort)
+
+            # start thread to fetch status from SDK
+            self.loop_thread = threading.Thread(target=self.read_veichle_status, name='LoopThread')
+            self.loop_thread.start()
         except:
             print "Failed to connect sdk"
 
@@ -52,6 +57,23 @@ class FalconHILModule(mp_module.MPModule):
             [ ('verbose', bool, False),
           ])
         self.add_command('falcon', self.cmd_falcon, "falcon commands", ['status','set (LOGSETTING)', 'readsystem'])
+
+    def start_sdk(self, serviceHost, servicePort):
+        # connect falcon sdk
+        try:
+            print "create sdk vehicle"
+            self.vehicle = sdk.Vehicle()
+            print "Connecting to Navigation Services @ %s:%d ...\n" % (serviceHost, servicePort)
+            # print "Connecting to Navigation Services @127.0.0.1:3000 ...\n"
+            # pdb.set_trace()
+            # self.vehicle.createConnection("127.0.0.1", 3000)
+            self.vehicle.createConnection(serviceHost, servicePort)
+
+            # start thread to fetch status from SDK
+            self.loop_thread = threading.Thread(target=self.read_veichle_status, name='LoopThread')
+            self.loop_thread.start()
+        except:
+            print "Failed to connect sdk"
 
     def usage(self):
         '''show help on command line options'''
@@ -75,6 +97,12 @@ class FalconHILModule(mp_module.MPModule):
             self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln") #goto gui-console
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
 
+            # self.dispatch_status_packet("hello from hil")
+        else:
+            print self.usage()
+
+    def dispatch_status_packet(self, packet):
+        try:
             # pass to modules
             for (mod, pm) in self.mpstate.modules:
                 if not hasattr(mod, 'hil_packet'):
@@ -82,10 +110,15 @@ class FalconHILModule(mp_module.MPModule):
                 # try:
                 mod.hil_packet("hello from hil")
                 # except Exception as msg:
+        except:
+            print "dispatch status packet failed"
+
+    def read_veichle_status(self):
+        while(True):
+            # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
+            self.dispatch_status_packet("hello from hil")
 
 
-        else:
-            print self.usage()
 
     def status(self):
         '''returns information about module'''
@@ -101,6 +134,13 @@ class FalconHILModule(mp_module.MPModule):
         if self.FalconHILModule_settings.verbose:
             return ("I'm very bored")
         return ("I'm bored")
+
+    def unload(self):
+        print "unload hil module now..."
+        # TODO disconnect SDK
+
+        # stop loop thread
+        self.loop_thread.exit()
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
