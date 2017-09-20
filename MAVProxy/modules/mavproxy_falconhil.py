@@ -15,6 +15,7 @@ import time
 import sdk
 import pdb
 import threading
+import time
 
 
 from MAVProxy.modules.lib import mp_module
@@ -43,6 +44,8 @@ class FalconHILModule(mp_module.MPModule):
             # pdb.set_trace()
             # self.vehicle.createConnection("127.0.0.1", 3000)
             # self.vehicle.createConnection(serviceHost, servicePort)
+
+            self.__running_sdk_loop = True
 
             # start thread to fetch status from SDK
             self.loop_thread = threading.Thread(target=self.read_veichle_status, name='LoopThread')
@@ -114,9 +117,10 @@ class FalconHILModule(mp_module.MPModule):
             print "dispatch status packet failed"
 
     def read_veichle_status(self):
-        while(True):
+        while(self.__running_sdk_loop):
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
             self.dispatch_status_packet("hello from hil")
+            time.sleep(5)
 
 
 
@@ -135,12 +139,15 @@ class FalconHILModule(mp_module.MPModule):
             return ("I'm very bored")
         return ("I'm bored")
 
+    def stop_loop_thread(self):
+        self.__running_sdk_loop = False
+        
     def unload(self):
         print "unload hil module now..."
         # TODO disconnect SDK
 
         # stop loop thread
-        self.loop_thread.exit()
+        self.__running_sdk_loop = False
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
