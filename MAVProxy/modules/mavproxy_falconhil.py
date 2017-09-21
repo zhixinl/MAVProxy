@@ -22,7 +22,7 @@ from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
-
+# vehicle = sdk.Vehicle()
 class FalconHILModule(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
@@ -40,9 +40,13 @@ class FalconHILModule(mp_module.MPModule):
             print "create sdk vehicle"
             self.vehicle = sdk.Vehicle()
             # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
-            print "Connecting to Navigation Services @127.0.0.1:3000 ...\n"
+            print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
             # pdb.set_trace()
-            # self.vehicle.createConnection("127.0.0.1", 3000)
+            # self.vehicle.createConnection("169.254.248.207", 65101)
+            self.vehicle.createConnection("169.254.248.207", 65101)
+            time.sleep(2)
+            # vehicle.createConnection("169.254.248.207", 65101)
+            print "connected sdk"
             # self.vehicle.createConnection(serviceHost, servicePort)
 
             self.__running_sdk_loop = True
@@ -118,11 +122,11 @@ class FalconHILModule(mp_module.MPModule):
 
     def read_veichle_status(self):
         while(self.__running_sdk_loop):
-            # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
-            # print "Drone GPS state: ", gpsState
+            gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
+            print "Drone GPS state: ", gpsState
             #
-            # gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
-            # print "Drone GPS position: ", gpsPosition
+            gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+            print "Drone GPS position: ", gpsPosition
 
             # TODO create MAVLink packet based on what we received from SDK
 
