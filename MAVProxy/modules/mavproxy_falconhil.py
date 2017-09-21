@@ -118,9 +118,17 @@ class FalconHILModule(mp_module.MPModule):
 
     def read_veichle_status(self):
         while(self.__running_sdk_loop):
-            # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
+            # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
+            # print "Drone GPS state: ", gpsState
+            #
+            # gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+            # print "Drone GPS position: ", gpsPosition
+
+            # TODO create MAVLink packet based on what we received from SDK
+
+            # dispatch MAVLink packet to other modules
             self.dispatch_status_packet("hello from hil")
-            time.sleep(5)
+            time.sleep(1)
 
 
 
