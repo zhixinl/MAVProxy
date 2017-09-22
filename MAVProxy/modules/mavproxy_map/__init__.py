@@ -37,7 +37,7 @@ class MapModule(mp_module.MPModule):
         self.draw_line = None
         self.draw_callback = None
         self.have_global_position = False
-        self.vehicle_type_name = 'plane'
+        self.vehicle_type_name = 'copter'
         self.ElevationMap = mp_elevation.ElevationModel()
         self.last_unload_check_time = time.time()
         self.unload_check_interval = 0.1 # seconds
