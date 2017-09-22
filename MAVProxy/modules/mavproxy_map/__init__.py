@@ -515,6 +515,7 @@ class MapModule(mp_module.MPModule):
                 self.mpstate.map.set_position('GPS2' + vehicle, (lat, lon), rotation=m.cog*0.01)
 
         if m.get_type() == 'GLOBAL_POSITION_INT':
+            print("$$$$$$$$$$$$$$$$$$ GLOBAL_POSITION_INT lat:", m.lat, " lon: ", m.lon, " hdg:", m.hdg)
             (self.lat, self.lon, self.heading) = (m.lat*1.0e-7, m.lon*1.0e-7, m.hdg*0.01)
             if abs(self.lat) > 1.0e-3 or abs(self.lon) > 1.0e-3:
                 self.have_global_position = True

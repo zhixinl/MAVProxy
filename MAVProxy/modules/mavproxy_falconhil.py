@@ -16,11 +16,15 @@ import sdk
 import pdb
 import threading
 import time
-
+import pymavlink
+from pymavlink import dialects
+from pymavlink.dialects.v10 import common
 
 from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
+
+# from MAVProxy.modules.lib import message
 
 # vehicle = sdk.Vehicle()
 class FalconHILModule(mp_module.MPModule):
@@ -43,7 +47,7 @@ class FalconHILModule(mp_module.MPModule):
             print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
             # pdb.set_trace()
             # self.vehicle.createConnection("169.254.248.207", 65101)
-            self.vehicle.createConnection("169.254.248.207", 65101)
+            # self.vehicle.createConnection("169.254.248.207", 65101)
             time.sleep(2)
             # vehicle.createConnection("169.254.248.207", 65101)
             print "connected sdk"
@@ -115,25 +119,45 @@ class FalconHILModule(mp_module.MPModule):
                 if not hasattr(mod, 'hil_packet'):
                     continue
                 # try:
-                mod.hil_packet("hello from hil")
+                # mod.hil_packet("hello from hil")
+                mod.hil_packet(packet)
                 # except Exception as msg:
         except:
             print "dispatch status packet failed"
 
     def read_veichle_status(self):
         while(self.__running_sdk_loop):
-            gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
-            print "Drone GPS state: ", gpsState
-            #
-            gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
-            print "Drone GPS position: ", gpsPosition
+            try:
+                # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
+                # print "Drone GPS state: ", gpsState
+                # #
+                # gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+                # print "Drone GPS position: ", gpsPosition
 
-            # TODO create MAVLink packet based on what we received from SDK
+                # TODO create MAVLink packet based on what we received from SDK
+                lat = -353632608
+                lon = 1491652351
+                hdg = 35260
 
-            # dispatch MAVLink packet to other modules
-            self.dispatch_status_packet("hello from hil")
-            time.sleep(1)
+                # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
+                # pymavlink.dialects
+                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, lat, lon, 0, 0,0,0,0,hdg)
+                type = globalPositionIntMsg.get_type()
+                print "type is: ", type
 
+                # dispatch MAVLink packet to other modules
+                # self.dispatch_status_packet("hello from hil")
+                self.dispatch_status_packet(globalPositionIntMsg)
+                time.sleep(1)
+            except:
+                print "read_veichile_status failed"
+
+
+    # def create_mavlink_msg(self):
+        # global_position_int_encode ?
+
+        # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
+        # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000)
 
 
     def status(self):
