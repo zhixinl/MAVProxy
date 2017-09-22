@@ -52,7 +52,7 @@ class FalconHILModule(mp_module.MPModule):
             print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
             # pdb.set_trace()
             # self.vehicle.createConnection("169.254.248.207", 65101)
-            # self.vehicle.createConnection("169.254.248.207", 65101)
+            self.vehicle.createConnection("169.254.248.207", 65101)
             time.sleep(2)
             # vehicle.createConnection("169.254.248.207", 65101)
             print "connected sdk"
@@ -136,11 +136,18 @@ class FalconHILModule(mp_module.MPModule):
                 # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
                 # print "Drone GPS state: ", gpsState
                 # #
-                # gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+                gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
                 # print "Drone GPS position: ", gpsPosition
+                self.lat = gpsPosition['latitude']
+                self.lon = gpsPosition['longitude']
+                height = gpsPosition['height']
+
+                # self.lon -= 4294967276
+
+                # print "####### lat: ", self.lat, " lon:", self.lon, " height", height
 
                 # TODO create MAVLink packet based on what we received from SDK
-                self.lat += 100 # = -353632608
+                # self.lat += 100 # = -353632608
                 # self.lon += 100 # 1491652351
                 # self.hdg = 35260
 
@@ -149,12 +156,12 @@ class FalconHILModule(mp_module.MPModule):
                 # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, lat, lon, 0, 0,0,0,0,hdg)
                 globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0,0,0,0, self.hdg)
                 type = globalPositionIntMsg.get_type()
-                print "type is: ", type
+                # print "type is: ", type
 
                 # dispatch MAVLink packet to other modules
                 # self.dispatch_status_packet("hello from hil")
                 self.dispatch_status_packet(globalPositionIntMsg)
-                time.sleep(0.3)
+                time.sleep(.3)
             except:
                 print "read_veichile_status failed"
 
@@ -197,7 +204,7 @@ class FalconHILModule(mp_module.MPModule):
         if now-self.last_bored > self.boredom_interval:
             self.last_bored = now
             message = self.boredom_message()
-            self.say("%s: %s" % (self.name,message))
+            # self.say("%s: %s" % (self.name,message))
             # See if whatever we're connected to would like to play:
             self.master.mav.statustext_send(mavutil.mavlink.MAV_SEVERITY_NOTICE,
                                             message)
