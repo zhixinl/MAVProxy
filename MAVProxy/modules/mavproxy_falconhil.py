@@ -39,6 +39,11 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
+        #TODO remove me
+        self.lat = -353632608
+        self.lon = 1491652351
+        self.hdg = 35260
+
         # connect falcon sdk
         try:
             print "create sdk vehicle"
@@ -135,20 +140,21 @@ class FalconHILModule(mp_module.MPModule):
                 # print "Drone GPS position: ", gpsPosition
 
                 # TODO create MAVLink packet based on what we received from SDK
-                lat = -353632608
-                lon = 1491652351
-                hdg = 35260
+                self.lat += 100 # = -353632608
+                # self.lon += 100 # 1491652351
+                # self.hdg = 35260
 
                 # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
                 # pymavlink.dialects
-                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, lat, lon, 0, 0,0,0,0,hdg)
+                # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, lat, lon, 0, 0,0,0,0,hdg)
+                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0,0,0,0, self.hdg)
                 type = globalPositionIntMsg.get_type()
                 print "type is: ", type
 
                 # dispatch MAVLink packet to other modules
                 # self.dispatch_status_packet("hello from hil")
                 self.dispatch_status_packet(globalPositionIntMsg)
-                time.sleep(1)
+                time.sleep(0.3)
             except:
                 print "read_veichile_status failed"
 
