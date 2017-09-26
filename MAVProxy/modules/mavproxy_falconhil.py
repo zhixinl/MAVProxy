@@ -6,27 +6,17 @@ This module is for Intel Falcon 8+ HIL.
 
 '''
 
-import os
-import os.path
 import sys
 from pymavlink import mavutil
-import errno
-import time
 import sdk
-import pdb
 import threading
 import time
-import pymavlink
-from pymavlink import dialects
 from pymavlink.dialects.v10 import common
 
 from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
-# from MAVProxy.modules.lib import message
-
-# vehicle = sdk.Vehicle()
 class FalconHILModule(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
@@ -50,13 +40,9 @@ class FalconHILModule(mp_module.MPModule):
             self.vehicle = sdk.Vehicle()
             # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
             print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
-            # pdb.set_trace()
-            # self.vehicle.createConnection("169.254.248.207", 65101)
             self.vehicle.createConnection("169.254.248.207", 65101)
             time.sleep(2)
-            # vehicle.createConnection("169.254.248.207", 65101)
             print "connected sdk"
-            # self.vehicle.createConnection(serviceHost, servicePort)
 
             self.__running_sdk_loop = True
 
@@ -80,8 +66,6 @@ class FalconHILModule(mp_module.MPModule):
             print "create sdk vehicle"
             self.vehicle = sdk.Vehicle()
             print "Connecting to Navigation Services @ %s:%d ...\n" % (serviceHost, servicePort)
-            # print "Connecting to Navigation Services @127.0.0.1:3000 ...\n"
-            # pdb.set_trace()
             # self.vehicle.createConnection("127.0.0.1", 3000)
             self.vehicle.createConnection(serviceHost, servicePort)
 
