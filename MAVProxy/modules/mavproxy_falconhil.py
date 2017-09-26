@@ -29,20 +29,25 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
+        self._fake_data = False
+
         #TODO remove me
-        self.lat = -353632608
-        self.lon = 1491652351
-        self.hdg = 35260
+        if(self._fake_data):
+            self.lat = -353632608
+            self.lon = 1491652351
+            self.hdg = 35260
+
 
         # connect falcon sdk
         try:
-            print "create sdk vehicle"
-            self.vehicle = sdk.Vehicle()
-            # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
-            print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
-            self.vehicle.createConnection("169.254.248.207", 65101)
-            time.sleep(2)
-            print "connected sdk"
+            if self._fake_data is False:
+                print "create sdk vehicle"
+                self.vehicle = sdk.Vehicle()
+                # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
+                print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
+                self.vehicle.createConnection("169.254.248.207", 65101)
+                time.sleep(2)
+                print "connected sdk"
 
             self.__running_sdk_loop = True
 
@@ -117,27 +122,24 @@ class FalconHILModule(mp_module.MPModule):
     def read_veichle_status(self):
         while(self.__running_sdk_loop):
             try:
-                # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
-                # print "Drone GPS state: ", gpsState
-                # #
-                gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
-                # print "Drone GPS position: ", gpsPosition
-                self.lat = gpsPosition['latitude']
-                self.lon = gpsPosition['longitude']
-                height = gpsPosition['height']
+                if self._fake_data is False:
+                    # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
+                    # print "Drone GPS state: ", gpsState
+                    # #
+                    gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+                    # print "Drone GPS position: ", gpsPosition
+                    self.lat = gpsPosition['latitude']
+                    self.lon = gpsPosition['longitude']
+                    height = gpsPosition['height']
 
-                # self.lon -= 4294967276
+                    # self.lon -= 4294967276
 
-                # print "####### lat: ", self.lat, " lon:", self.lon, " height", height
+                    # print "####### lat: ", self.lat, " lon:", self.lon, " height", height
+                else:
+                    self.lat += 100 # = -353632608
+                    self.lon += 100 # 1491652351
+                    self.hdg = 35260
 
-                # TODO create MAVLink packet based on what we received from SDK
-                # self.lat += 100 # = -353632608
-                # self.lon += 100 # 1491652351
-                # self.hdg = 35260
-
-                # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
-                # pymavlink.dialects
-                # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, lat, lon, 0, 0,0,0,0,hdg)
                 globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0,0,0,0, self.hdg)
                 type = globalPositionIntMsg.get_type()
                 # print "type is: ", type

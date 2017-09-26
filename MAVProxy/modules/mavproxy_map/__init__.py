@@ -105,7 +105,7 @@ class MapModule(mp_module.MPModule):
         self.mpstate.map.add_object(mp_slipmap.SlipDefaultPopup(self.default_popup, combine=True))
 
     def hil_packet(self, packet):
-        # print("enter map::@@@@@@@@@@@@hil_packet")
+        '''handle an incoming mavlink packet from HIL module'''
         self.mavlink_packet(packet)
 
     def show_position(self):
@@ -463,8 +463,6 @@ class MapModule(mp_module.MPModule):
         self.mpstate.map.set_position('VehiclePos2', (lat, lon), rotation=heading)
 
     def mavlink_packet(self, m):
-        # print("enter map::@@@@@@@@@@@@ mavlink_packet")
-
         '''handle an incoming mavlink packet'''
         from MAVProxy.modules.mavproxy_map import mp_slipmap
         if m.get_type() == "HEARTBEAT":
@@ -515,9 +513,11 @@ class MapModule(mp_module.MPModule):
                 self.mpstate.map.set_position('GPS2' + vehicle, (lat, lon), rotation=m.cog*0.01)
 
         if m.get_type() == 'GLOBAL_POSITION_INT':
+            # TODO GPS data hacking for drone-sdk only
             m.lon *= 1.0e+7
             m.lat *= 1.0e+7
             m.lon -= 4294967276
+
             # print("##################### GLOBAL_POSITION_INT lat:", m.lat, " lon: ", m.lon, " hdg:", m.hdg)
             (self.lat, self.lon, self.heading) = (m.lat*1.0e-7, m.lon*1.0e-7, m.hdg*0.01)
             # print("$$$$$$$$$$$$$$$$$$ GLOBAL_POSITION_INT lat:", self.lat, " lon: ", self.lon, " hdg:", m.hdg)
