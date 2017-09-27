@@ -29,7 +29,8 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
-        self._fake_data = False
+        self._fake_data = True
+        self._sdk_connected = False
 
         #TODO remove me
         if(self._fake_data):
@@ -40,19 +41,24 @@ class FalconHILModule(mp_module.MPModule):
 
         # connect falcon sdk
         try:
+            print "Load falconhil module"
             if self._fake_data is False:
                 print "create sdk vehicle"
                 self.vehicle = sdk.Vehicle()
                 # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
                 print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
                 self.vehicle.createConnection("169.254.248.207", 65101)
+
+                # TODO check connection success or not
+                self._sdk_connected = True
+
                 time.sleep(2)
                 print "connected sdk"
 
             self.__running_sdk_loop = True
 
             # start thread to fetch status from SDK
-            self.loop_thread = threading.Thread(target=self.read_veichle_status, name='LoopThread')
+            self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
             self.loop_thread.start()
         except:
             print "Failed to connect sdk"
@@ -63,7 +69,7 @@ class FalconHILModule(mp_module.MPModule):
         self.FalconHILModule_settings = mp_settings.MPSettings(
             [ ('verbose', bool, False),
           ])
-        self.add_command('falcon', self.cmd_falcon, "falcon commands", ['status','set (LOGSETTING)', 'readsystem'])
+        self.add_command('falcon', self.cmd_falcon, "falcon commands", ['status','set (LOGSETTING)', 'readsystem', 'wp'])
 
     def start_sdk(self, serviceHost, servicePort):
         # connect falcon sdk
@@ -75,7 +81,7 @@ class FalconHILModule(mp_module.MPModule):
             self.vehicle.createConnection(serviceHost, servicePort)
 
             # start thread to fetch status from SDK
-            self.loop_thread = threading.Thread(target=self.read_veichle_status, name='LoopThread')
+            self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
             self.loop_thread.start()
         except:
             print "Failed to connect sdk"
@@ -85,6 +91,10 @@ class FalconHILModule(mp_module.MPModule):
         return "Usage: falcon <status|set|readsystem>"
 
     def cmd_falcon(self, args):
+        # if self._sdk_connected is False:
+        #     print("Connect SDK first")
+        #     return
+
         '''control behaviour of the module'''
         self.say("enter cmd_falcon")
         print("enter cmd_falcon - print")
@@ -103,8 +113,43 @@ class FalconHILModule(mp_module.MPModule):
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
 
             # self.dispatch_status_packet("hello from hil")
+        elif args[0] == "wp":
+            print("falcon wp command")
+            self.run_wp_command(args)
+
         else:
             print self.usage()
+
+    def run_wp_command(self, args):
+        print("run_wp_command +++")
+        print("wp args: %s" % args)
+        for i in range(len(args)):
+            print("args[%d] is %s" % (i, args[i]))
+
+        if args[1] == "start_motor":
+            print("wp start_motor")
+            # self.vehicle.mission_manager().start_motors()
+        elif args[1] == "stop_motor":
+            print("wp stop_motor")
+            # self.vehicle.mission_manager().stop_motors()
+        elif args[1] == "start_flight":
+            print("wp start_flight")
+            # self.vehicle.mission_manager().start_fight()
+        elif args[1] == "stop_flight":
+            print("wp stop_flight")
+            # self.vehicle.mission_manager().stop_fight()
+        elif args[1] == "pause_flight":
+            print("wp pause_flight")
+            # self.vehicle.mission_manager().pause_fight()
+        elif args[1] == "come_home":
+            print("wp come_home")
+            # self.vehicle.mission_manager().come_home()
+        elif args[1] == "fly_to_waypoint":
+            print("wp fly_to_waypoint")
+            # self.vehicle.mission_manager().fly_to_waypoint()
+
+        # for arg in args:
+        #     print("arg: %s" % arg)
 
     def dispatch_status_packet(self, packet):
         try:
@@ -119,7 +164,7 @@ class FalconHILModule(mp_module.MPModule):
         except:
             print "dispatch status packet failed"
 
-    def read_veichle_status(self):
+    def read_vehicle_status(self):
         while(self.__running_sdk_loop):
             try:
                 if self._fake_data is False:
@@ -141,15 +186,14 @@ class FalconHILModule(mp_module.MPModule):
                     self.hdg = 35260
 
                 globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0,0,0,0, self.hdg)
-                type = globalPositionIntMsg.get_type()
+                # type = globalPositionIntMsg.get_type()
                 # print "type is: ", type
 
                 # dispatch MAVLink packet to other modules
-                # self.dispatch_status_packet("hello from hil")
                 self.dispatch_status_packet(globalPositionIntMsg)
                 time.sleep(.3)
             except:
-                print "read_veichile_status failed"
+                print "read_vehicle_status failed"
 
 
     # def create_mavlink_msg(self):
