@@ -30,7 +30,7 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
-        self._fake_data = True
+        self._fake_data = False
         self._sdk_connected = False
 
         # TODO remove me
@@ -47,7 +47,11 @@ class FalconHILModule(mp_module.MPModule):
                 self.vehicle = sdk.Vehicle()
                 # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
                 print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
-                self.vehicle.createConnection("169.254.248.207", 65101)
+                i = self.vehicle.create_connection("169.254.149.19", 65101)
+                if i == 0:
+                    print("connected sdk")
+                else:
+                    print("Connection to sdk failed #######")
 
                 # TODO check connection success or not
                 self._sdk_connected = True
@@ -168,13 +172,15 @@ class FalconHILModule(mp_module.MPModule):
                     # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
                     # print "Drone GPS state: ", gpsState
                     # #
-                    gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+                    # gpsPosition = self.vehicle.droneControl().droneGPSPosition().getGPSPosition()
+                    gpsPosition = self.vehicle.drone_control().gps_position().get_gps_position()
                     # print "Drone GPS position: ", gpsPosition
                     self.lat = gpsPosition['latitude']
                     self.lon = gpsPosition['longitude']
                     height = gpsPosition['height']
 
                     # self.lon -= 4294967276
+                    self.hdg = 35260
 
                     # print "####### lat: ", self.lat, " lon:", self.lon, " height", height
                 else:
