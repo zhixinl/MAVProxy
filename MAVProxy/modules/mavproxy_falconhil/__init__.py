@@ -17,12 +17,13 @@ from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
+
 class FalconHILModule(mp_module.MPModule):
     def __init__(self, mpstate):
         """Initialise module"""
         super(FalconHILModule, self).__init__(mpstate, "falconhil", "Falcon 8+ HIL")
         self.status_callcount = 0
-        self.boredom_interval = 10 # seconds
+        self.boredom_interval = 10  # seconds
         self.last_bored = time.time()
 
         self.packets_mytarget = 0
@@ -32,12 +33,11 @@ class FalconHILModule(mp_module.MPModule):
         self._fake_data = True
         self._sdk_connected = False
 
-        #TODO remove me
-        if(self._fake_data):
+        # TODO remove me
+        if (self._fake_data):
             self.lat = -353632608
             self.lon = 1491652351
             self.hdg = 35260
-
 
         # connect falcon sdk
         try:
@@ -63,13 +63,13 @@ class FalconHILModule(mp_module.MPModule):
         except:
             print "Failed to connect sdk"
 
-
         # add command
 
         self.FalconHILModule_settings = mp_settings.MPSettings(
-            [ ('verbose', bool, False),
-          ])
-        self.add_command('falcon', self.cmd_falcon, "falcon commands", ['status','set (LOGSETTING)', 'readsystem', 'wp'])
+            [('verbose', bool, False),
+             ])
+        self.add_command('falcon', self.cmd_falcon, "falcon commands",
+                         ['status', 'set (LOGSETTING)', 'readsystem', 'wp'])
 
     def start_sdk(self, serviceHost, servicePort):
         # connect falcon sdk
@@ -107,9 +107,9 @@ class FalconHILModule(mp_module.MPModule):
             self.say("call set command with arg %s" % (args[1]))
             self.FalconHILModule_settings.command(args[1:])
         elif args[0] == "readsystem":
-            self.say("call read system info command") #goto gui-console
-            print "call readsystem command - print" # goto console
-            self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln") #goto gui-console
+            self.say("call read system info command")  # goto gui-console
+            print "call readsystem command - print"  # goto console
+            self.mpstate.console.writeln("call readsystem command - mpstate.console.writeln")  # goto gui-console
             # dsi = self.vehicle.droneSystemInfo().getSystemInfo()
 
             # self.dispatch_status_packet("hello from hil")
@@ -148,9 +148,6 @@ class FalconHILModule(mp_module.MPModule):
             print("wp fly_to_waypoint")
             # self.vehicle.mission_manager().fly_to_waypoint()
 
-        # for arg in args:
-        #     print("arg: %s" % arg)
-
     def dispatch_status_packet(self, packet):
         try:
             # pass to modules
@@ -165,7 +162,7 @@ class FalconHILModule(mp_module.MPModule):
             print "dispatch status packet failed"
 
     def read_vehicle_status(self):
-        while(self.__running_sdk_loop):
+        while (self.__running_sdk_loop):
             try:
                 if self._fake_data is False:
                     # gpsState = self.vehicle.droneState().droneGPSState().getGPSState()
@@ -181,11 +178,12 @@ class FalconHILModule(mp_module.MPModule):
 
                     # print "####### lat: ", self.lat, " lon:", self.lon, " height", height
                 else:
-                    self.lat += 100 # = -353632608
-                    self.lon += 100 # 1491652351
+                    self.lat += 100  # = -353632608
+                    self.lon += 100  # 1491652351
                     self.hdg = 35260
 
-                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0,0,0,0, self.hdg)
+                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0, 0, 0,
+                                                                                  0, self.hdg)
                 # type = globalPositionIntMsg.get_type()
                 # print "type is: ", type
 
@@ -196,22 +194,22 @@ class FalconHILModule(mp_module.MPModule):
                 print "read_vehicle_status failed"
 
 
-    # def create_mavlink_msg(self):
-        # global_position_int_encode ?
+                # def create_mavlink_msg(self):
+                # global_position_int_encode ?
 
-        # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
-        # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000)
-
+                # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
+                # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000)
 
     def status(self):
         '''returns information about module'''
         self.status_callcount += 1
-        self.last_bored = time.time() # status entertains us
-        return("status called %(status_callcount)d times.  My target positions=%(packets_mytarget)u  Other target positions=%(packets_mytarget)u" %
-               {"status_callcount": self.status_callcount,
-                "packets_mytarget": self.packets_mytarget,
-                "packets_othertarget": self.packets_othertarget,
-               })
+        self.last_bored = time.time()  # status entertains us
+        return (
+        "status called %(status_callcount)d times.  My target positions=%(packets_mytarget)u  Other target positions=%(packets_mytarget)u" %
+        {"status_callcount": self.status_callcount,
+         "packets_mytarget": self.packets_mytarget,
+         "packets_othertarget": self.packets_othertarget,
+         })
 
     def boredom_message(self):
         if self.FalconHILModule_settings.verbose:
@@ -220,7 +218,7 @@ class FalconHILModule(mp_module.MPModule):
 
     def stop_loop_thread(self):
         self.__running_sdk_loop = False
-        
+
     def unload(self):
         print "unload hil module now..."
         # TODO disconnect SDK
@@ -231,7 +229,7 @@ class FalconHILModule(mp_module.MPModule):
     def idle_task(self):
         '''called rapidly by mavproxy'''
         now = time.time()
-        if now-self.last_bored > self.boredom_interval:
+        if now - self.last_bored > self.boredom_interval:
             self.last_bored = now
             message = self.boredom_message()
             # self.say("%s: %s" % (self.name,message))
@@ -246,6 +244,7 @@ class FalconHILModule(mp_module.MPModule):
                 self.packets_mytarget += 1
             else:
                 self.packets_othertarget += 1
+
 
 def init(mpstate):
     '''initialise module'''
