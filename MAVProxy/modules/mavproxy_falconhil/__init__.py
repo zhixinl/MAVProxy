@@ -17,6 +17,8 @@ from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
+from falcon_connection_manager import FalconConnectionManager
+
 
 class FalconHILModule(mp_module.MPModule):
     def __init__(self, mpstate):
@@ -30,28 +32,46 @@ class FalconHILModule(mp_module.MPModule):
         self.packets_othertarget = 0
         self.verbose = False
 
-        self._fake_data = False
+        self._fake_data = True
         self._sdk_connected = False
 
+        self._falcon_connection_manager = FalconConnectionManager()
+
         # TODO remove me
-        if (self._fake_data):
+        if self._fake_data:
             self.lat = -353632608
             self.lon = 1491652351
             self.hdg = 35260
 
-        # connect falcon sdk
+        self.start_sdk("169.254.149.19", 65101)
+
+        # add command
+        self.FalconHILModule_settings = mp_settings.MPSettings(
+            [('verbose', bool, False),
+             ])
+        self.add_command('falcon', self.cmd_falcon, "falcon commands",
+                         ['status', 'set (LOGSETTING)', 'readsystem', 'wp'])
+
+    def start_sdk(self, host, port):
         try:
             print "Load falconhil module"
             if self._fake_data is False:
                 print "create sdk vehicle"
-                self.vehicle = sdk.Vehicle()
-                # print "Connecting to Navigation Services @ %s:%d ...\n" %(serviceHost, servicePort)
-                print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
-                i = self.vehicle.create_connection("169.254.149.19", 65101)
-                if i == 0:
-                    print("connected sdk")
+                # self.vehicle = sdk.Vehicle()
+                # print "Connecting to Navigation Services @169.254.248.207:65101 ...\n"
+                # i = self.vehicle.create_connection("169.254.149.19", 65101)
+                # if i == 0:
+                #     print("connected sdk")
+                # else:
+                #     print("Connection to sdk failed #######")
+
+                # self.vehicle = self._falcon_connection_manager.create_connection("169.254.149.19", 65101)
+                self.vehicle = self._falcon_connection_manager.create_connection(host, port)
+                if self.vehicle is None:
+                    print("connection to sdk failed ****")
+                    return
                 else:
-                    print("Connection to sdk failed #######")
+                    print("connected sdk")
 
                 # TODO check connection success or not
                 self._sdk_connected = True
@@ -64,29 +84,7 @@ class FalconHILModule(mp_module.MPModule):
             # start thread to fetch status from SDK
             self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
             self.loop_thread.start()
-        except:
-            print "Failed to connect sdk"
 
-        # add command
-
-        self.FalconHILModule_settings = mp_settings.MPSettings(
-            [('verbose', bool, False),
-             ])
-        self.add_command('falcon', self.cmd_falcon, "falcon commands",
-                         ['status', 'set (LOGSETTING)', 'readsystem', 'wp'])
-
-    def start_sdk(self, serviceHost, servicePort):
-        # connect falcon sdk
-        try:
-            print "create sdk vehicle"
-            self.vehicle = sdk.Vehicle()
-            print "Connecting to Navigation Services @ %s:%d ...\n" % (serviceHost, servicePort)
-            # self.vehicle.createConnection("127.0.0.1", 3000)
-            self.vehicle.createConnection(serviceHost, servicePort)
-
-            # start thread to fetch status from SDK
-            self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
-            self.loop_thread.start()
         except:
             print "Failed to connect sdk"
 
