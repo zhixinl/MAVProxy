@@ -18,6 +18,7 @@ from MAVProxy.modules.lib import mp_util
 from MAVProxy.modules.lib import mp_settings
 
 from falcon_connection_manager import FalconConnectionManager
+from falcon_wp_handler import FalconWPHandler
 
 
 class FalconHILModule(mp_module.MPModule):
@@ -44,6 +45,8 @@ class FalconHILModule(mp_module.MPModule):
             self.hdg = 35260
 
         self.start_sdk("169.254.149.19", 65101)
+
+        # self.__wp_handler = FalconWPHandler()
 
         # add command
         self.FalconHILModule_settings = mp_settings.MPSettings(
@@ -78,8 +81,11 @@ class FalconHILModule(mp_module.MPModule):
 
                 time.sleep(2)
                 print "connected sdk"
+            else:
+                self.vehicle = sdk.Vehicle()
 
             self.__running_sdk_loop = True
+            self.__wp_handler = FalconWPHandler(self.vehicle)
 
             # start thread to fetch status from SDK
             self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
@@ -117,38 +123,9 @@ class FalconHILModule(mp_module.MPModule):
             # self.dispatch_status_packet("hello from hil")
         elif args[0] == "wp":
             print("falcon wp command")
-            self.run_wp_command(args)
-
+            self.__wp_handler.handle_wp_commands(args)
         else:
             print self.usage()
-
-    def run_wp_command(self, args):
-        print("run_wp_command +++")
-        print("wp args: %s" % args)
-        for i in range(len(args)):
-            print("args[%d] is %s" % (i, args[i]))
-
-        if args[1] == "start_motor":
-            print("wp start_motor")
-            # self.vehicle.mission_manager().start_motors()
-        elif args[1] == "stop_motor":
-            print("wp stop_motor")
-            # self.vehicle.mission_manager().stop_motors()
-        elif args[1] == "start_flight":
-            print("wp start_flight")
-            # self.vehicle.mission_manager().start_fight()
-        elif args[1] == "stop_flight":
-            print("wp stop_flight")
-            # self.vehicle.mission_manager().stop_fight()
-        elif args[1] == "pause_flight":
-            print("wp pause_flight")
-            # self.vehicle.mission_manager().pause_fight()
-        elif args[1] == "come_home":
-            print("wp come_home")
-            # self.vehicle.mission_manager().come_home()
-        elif args[1] == "fly_to_waypoint":
-            print("wp fly_to_waypoint")
-            # self.vehicle.mission_manager().fly_to_waypoint()
 
     def dispatch_status_packet(self, packet):
         try:
@@ -196,13 +173,6 @@ class FalconHILModule(mp_module.MPModule):
                 time.sleep(.3)
             except:
                 print "read_vehicle_status failed"
-
-
-                # def create_mavlink_msg(self):
-                # global_position_int_encode ?
-
-                # time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg
-                # globalPositionIntMsg = common.MAVLink_global_position_int_message(1000)
 
     def status(self):
         '''returns information about module'''
