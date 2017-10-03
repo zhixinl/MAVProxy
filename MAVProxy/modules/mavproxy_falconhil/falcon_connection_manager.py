@@ -57,6 +57,7 @@ class FalconConnectionManager:
             self.__falcon_is_on = True
 
         while self.__falcon_is_on:
+            print("read_vehicle_status loop")
             try:
                 if self._fake_data is False:
                     gpsPosition = self.vehicle.drone_control().gps_position().get_gps_position()
@@ -92,3 +93,6 @@ class FalconConnectionManager:
                 # except Exception as msg:
         except:
             print "dispatch status packet failed"
+
+    def stop_loop_thread(self):
+        self.__falcon_is_on = False

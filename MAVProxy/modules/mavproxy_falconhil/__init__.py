@@ -6,9 +6,7 @@ This module is for Intel Falcon 8+ HIL.
 
 '''
 
-import sys
 from pymavlink import mavutil
-import sdk
 import time
 
 from MAVProxy.modules.lib import mp_module
@@ -35,7 +33,7 @@ class FalconHILModule(mp_module.MPModule):
 
         self._falcon_connection_manager = FalconConnectionManager(self.mpstate)
 
-        self.start_sdk("169.254.149.19", 65101)
+        self.connect_falcon("169.254.149.19", 65101)
 
         # add command
         self.FalconHILModule_settings = mp_settings.MPSettings(
@@ -44,7 +42,7 @@ class FalconHILModule(mp_module.MPModule):
         self.add_command('falcon', self.cmd_falcon, "falcon commands",
                          ['status', 'set (LOGSETTING)', 'readsystem', 'wp'])
 
-    def start_sdk(self, host, port):
+    def connect_falcon(self, host, port):
         try:
             print "Load falconhil module"
             print "create sdk vehicle"
@@ -116,15 +114,16 @@ class FalconHILModule(mp_module.MPModule):
             return ("I'm very bored")
         return ("I'm bored")
 
-    def stop_loop_thread(self):
+    def disconnect_falcon(self):
         self.__running_sdk_loop = False
+        self._falcon_connection_manager.stop_loop_thread()
 
     def unload(self):
         print "unload hil module now..."
         # TODO disconnect SDK
 
-        # stop loop thread
-        self.__running_sdk_loop = False
+        # disconnect sdk
+        self.disconnect_falcon()
 
     def idle_task(self):
         '''called rapidly by mavproxy'''
