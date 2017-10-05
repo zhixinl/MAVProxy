@@ -8,7 +8,7 @@ This class is used to manage sdk connection.
 
 import sdk
 from pymavlink.dialects.v10 import common
-import time
+import time, os
 import threading
 from falcon_util import FalconLogWriter
 from pymavlink import mavutil
@@ -21,8 +21,8 @@ class FalconConnectionManager:
         self.mpstate = mpstate
         self.__falcon_is_on = False
         self._fake_data = True
-
-        self.falconlog = FalconLogWriter("../../../buildlogs/ArduCopter-test_map.tlog")   # Open log 
+        self.logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
+        self.falconlog = FalconLogWriter(self.logpath)   # Open log 
         self.mode = 4
         self.falconlog.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
 
@@ -84,9 +84,8 @@ class FalconConnectionManager:
                                                                                   0, self.hdg)
                 # dispatch MAVLink packet to other modules
                 self.dispatch_status_packet(globalPositionIntMsg)
-                #globalPositionIntMsg.pack(self.mpstate.master.mav)
+                globalPositionIntMsg.pack(self.mpstate.master().mav)
                 # Write in the log.
-                globalPositionIntMsg.pack(self.mpstate.mav_master[0].mav)
                 self.falconlog.hil_log(globalPositionIntMsg)
                 time.sleep(.3)
             except:
@@ -114,7 +113,7 @@ class FalconConnectionManager:
     def heartbeat_packet_for_mode(self, custom_mode=4):
         try:
             heartbeat_packet = common.MAVLink_heartbeat_message(mavutil.mavlink.MAV_TYPE_OCTOROTOR, mavutil.mavlink.MAV_AUTOPILOT_GENERIC, mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, custom_mode, 0, 0)
-            heartbeat_packet.pack(self.mpstate.mav_master[0].mav)
+            heartbeat_packet.pack(self.mpstate.master().mav)
             return heartbeat_packet
         except:
             print "heart beat packet generation failed"
