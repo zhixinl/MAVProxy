@@ -44,6 +44,7 @@ class FalconConnectionManager:
             else:
                 self.__vehicle = sdk.Vehicle()
 
+            # time.sleep(3)
             # start thread to fetch status from SDK
             self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
             self.loop_thread.start()
@@ -57,10 +58,9 @@ class FalconConnectionManager:
             self.__falcon_is_on = True
 
         while self.__falcon_is_on:
-            print("read_vehicle_status loop")
             try:
                 if self._fake_data is False:
-                    gpsPosition = self.vehicle.drone_control().gps_position().get_gps_position()
+                    gpsPosition = self.__vehicle.drone_control().gps_position().get_gps_position()
                     # print "Drone GPS position: ", gpsPosition
                     self.lat = gpsPosition['latitude']
                     self.lon = gpsPosition['longitude']
@@ -81,6 +81,7 @@ class FalconConnectionManager:
                 time.sleep(.3)
             except:
                 print "read_vehicle_status failed"
+                # break
 
     def dispatch_status_packet(self, packet):
         try:
