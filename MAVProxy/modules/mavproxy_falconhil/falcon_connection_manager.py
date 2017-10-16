@@ -20,7 +20,7 @@ class FalconConnectionManager:
         print("FalconConnection __init__ +++")
         self.mpstate = mpstate
         self.__falcon_is_on = False
-        self._fake_data = True
+        self._fake_data = False
         self.logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
         self.falconlog = FalconLogWriter(self.logpath)   # Open log 
         self.mode = 4
@@ -40,7 +40,7 @@ class FalconConnectionManager:
                 self.__vehicle = sdk.Vehicle()
                 print "Connecting to Navigation Services @ %s:%d ...\n" % (serviceHost, servicePort)
                 # self.vehicle.createConnection(serviceHost, servicePort)
-                i = self.__vehicle.create_connection("169.254.149.19", 65101)
+                i = self.__vehicle.create_connection("169.254.248.207", 65101)  # 169.254.149.19
                 if i == 0:
                     print("connected sdk")
                     self.__falcon_is_on = True

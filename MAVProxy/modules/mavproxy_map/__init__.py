@@ -514,9 +514,9 @@ class MapModule(mp_module.MPModule):
 
         if m.get_type() == 'GLOBAL_POSITION_INT':
             # TODO GPS data hacking for drone-sdk only
-            #m.lon *= 1.0e+7
-            #m.lat *= 1.0e+7
-            #m.lon -= 4294967276
+            m.lon *= 1.0e+7
+            m.lat *= 1.0e+7
+            m.lon -= 4294967276
 
             # print("##################### GLOBAL_POSITION_INT lat:", m.lat, " lon: ", m.lon, " hdg:", m.hdg)
             (self.lat, self.lon, self.heading) = (m.lat*1.0e-7, m.lon*1.0e-7, m.hdg*0.01)
