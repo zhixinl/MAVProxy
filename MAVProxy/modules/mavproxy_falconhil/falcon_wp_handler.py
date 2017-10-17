@@ -20,10 +20,11 @@ class FalconWPHandler:
         self.__vehicle = vehicle
 
     def handle_wp_commands(self, args):
-        print("handle_wp_commands +++")
-        print("wp args: %s" % args)
+        print("###handle_wp_commands +++")
+        print("###handle_wp_commands: wp args: %s" % args)
         for i in range(len(args)):
-            print("args[%d] is %s" % (i, args[i]))
+            print("### handle_wp_commands args[%d] is %s" % (i, args[i]))
+            print("#### handle_wp_commands args:", args[i])
 
         if args[1] == "start_motor":
             print("###wp start_motor")
@@ -43,10 +44,14 @@ class FalconWPHandler:
         elif args[1] == "come_home":
             print("wp come_home")
             # self.__vehicle.mission_manager().come_home()
+        elif args[1] == 'append_waypoint':
+            print("##### handle_wp_commands: append_waypoint ", args[2])
+            print args[2]
+            # self.__vehicle.mission_manager().append_waypoint(args[2])
         elif args[1] == "fly_to_waypoint":
             print("####wp fly_to_waypoint")
-            self.mission_thread = threading.Thread(target=self.fly_mission, name='MissionThread')
-            self.mission_thread.start()
+            # self.mission_thread = threading.Thread(target=self.fly_mission, name='MissionThread')
+            # self.mission_thread.start()
 
             # self.__vehicle.mission_manager().fly_to_waypoint()
 

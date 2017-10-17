@@ -93,7 +93,7 @@ class FalconHILModule(mp_module.MPModule):
 
             # self.dispatch_status_packet("hello from hil")
         elif args[0] == "wp":
-            print("falcon wp command")
+            print("$$$$$ falcon wp command")
             self.__wp_handler.handle_wp_commands(args)
         else:
             print self.usage()
