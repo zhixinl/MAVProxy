@@ -71,6 +71,9 @@ class FalconConnectionManager:
                     self.lat = gpsPosition['latitude']
                     self.lon = gpsPosition['longitude']
                     height = gpsPosition['height']
+                    self.lon *= 1.0e+7
+                    self.lat *= 1.0e+7
+                    self.lon -= 4294967276 # Subtracting 2^32
 
                     self.hdg = 35260
 
@@ -80,7 +83,7 @@ class FalconConnectionManager:
                     self.lon += 100  # 1491652351
                     self.hdg = 35260
 
-                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, self.lat, self.lon, 0, 0, 0, 0,
+                globalPositionIntMsg = common.MAVLink_global_position_int_message(1000, int(self.lat), int(self.lon), 0, 0, 0, 0,
                                                                                   0, self.hdg)
                 # dispatch MAVLink packet to other modules
                 self.dispatch_status_packet(globalPositionIntMsg)
