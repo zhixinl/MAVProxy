@@ -513,11 +513,6 @@ class MapModule(mp_module.MPModule):
                 self.mpstate.map.set_position('GPS2' + vehicle, (lat, lon), rotation=m.cog*0.01)
 
         if m.get_type() == 'GLOBAL_POSITION_INT':
-            # TODO GPS data hacking for drone-sdk only
-            m.lon *= 1.0e+7
-            m.lat *= 1.0e+7
-            m.lon -= 4294967276
-
             # print("##################### GLOBAL_POSITION_INT lat:", m.lat, " lon: ", m.lon, " hdg:", m.hdg)
             (self.lat, self.lon, self.heading) = (m.lat*1.0e-7, m.lon*1.0e-7, m.hdg*0.01)
             # print("$$$$$$$$$$$$$$$$$$ GLOBAL_POSITION_INT lat:", self.lat, " lon: ", self.lon, " hdg:", m.hdg)
