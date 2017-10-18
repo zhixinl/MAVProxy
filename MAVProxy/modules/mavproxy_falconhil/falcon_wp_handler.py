@@ -11,6 +11,9 @@ import csv
 import time
 from ast import literal_eval
 import threading
+from ast import literal_eval
+import csv
+import sys
 
 
 class FalconWPHandler:
@@ -48,6 +51,10 @@ class FalconWPHandler:
             print("##### handle_wp_commands: append_waypoint ", args[2])
             print args[2]
             # self.__vehicle.mission_manager().append_waypoint(args[2])
+        elif args[1] == 'load_mission':
+            print("mission file is %s" % args[2])
+            self.load_mission(args[2])
+
         elif args[1] == "fly_to_waypoint":
             print("####wp fly_to_waypoint")
             # self.mission_thread = threading.Thread(target=self.fly_mission, name='MissionThread')
@@ -55,6 +62,26 @@ class FalconWPHandler:
 
             # self.__vehicle.mission_manager().fly_to_waypoint()
 
+    def load_mission(self, filename):
+        try:
+            with open(filename, 'rb') as csvfile:
+                print("open csv successfully")
+                reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+                print("read csv successfully")
+                for row in reader:
+                    l = []
+                    p = [x for x in row[0].split(',')]
+                    for y in range(len(p)):
+                        [l.append(int(p[y]))
+                         if isinstance(literal_eval(p[y]), int) is True
+                         else l.append(float(p[y]))]
+                    print("######load_mission: append points list:", l)
+                    # self.__vehicle.mission_manager().append_waypoint(l)
+                print("### load_mission: call start_fligh now")
+                # self.__vehicle.mission_manager().start_fight()
+
+        except IOError as error:
+            print("fly falcon mission failed")
     def fly_mission(self):
         print("fly_mission +++")
         with open('waypoints.csv', 'rb') as csvfile:
