@@ -21,17 +21,6 @@ class FalconConnectionManager:
         self.mpstate = mpstate
         self.__falcon_is_on = False
         self._fake_data = True
-        # self.logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
-        # self.falconlog = FalconLogWriter(self.logpath)   # Open log
-        # self.mode = 4
-        # self.falconlog.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
-        # self.mpstate.falcon_logfile.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
-
-        logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
-        self.mpstate.falconlog = FalconLogWriter(logpath)  # Open log
-        mode = 4
-        self.mpstate.falconlog.hil_log(
-            self.heartbeat_packet_for_mode(mode))  # Send a heartbeat packet with default mode of GUIDED.
 
         # TODO remove me
         if self._fake_data:
@@ -117,21 +106,6 @@ class FalconConnectionManager:
                 # except Exception as msg:
         except:
             print "dispatch status packet failed"
-
-    ''' 
-    This method is used to generate HEARTBEAT packet that is going to send flightmode information for the image and the legend.
-    It takes custom_mode int values. For more mapping modes look at mode_mapping_acm in mavutil.py
-    default custom_mode 4 is GUIDED mode plotted in dark green
-    '''
-    
-    def heartbeat_packet_for_mode(self, custom_mode=4):
-        try:
-            heartbeat_packet = common.MAVLink_heartbeat_message(mavutil.mavlink.MAV_TYPE_OCTOROTOR, mavutil.mavlink.MAV_AUTOPILOT_GENERIC, mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, custom_mode, 0, 0)
-            heartbeat_packet.pack(self.mpstate.master().mav)
-            return heartbeat_packet
-        except:
-            print "heart beat packet generation failed"
-     
 
     def stop_loop_thread(self):
         self.__falcon_is_on = False

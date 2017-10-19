@@ -7,13 +7,16 @@ This module is for Intel Falcon 8+ HIL.
 '''
 
 from pymavlink import mavutil
-import time
+import time, os
+from falcon_util import FalconLogWriter
 
 from MAVProxy.modules.lib import mp_module
 from MAVProxy.modules.lib import mp_settings
 
 from falcon_connection_manager import FalconConnectionManager
 from falcon_wp_handler import FalconWPHandler
+
+from pymavlink.dialects.v10 import common
 
 
 class FalconHILModule(mp_module.MPModule):
@@ -31,6 +34,12 @@ class FalconHILModule(mp_module.MPModule):
         # self._fake_data = True
         self._sdk_connected = False
 
+        logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
+        self.mpstate.falconlog = FalconLogWriter(logpath)  # Open log
+        mode = 4
+        self.mpstate.falconlog.hil_log(
+            self.heartbeat_packet_for_mode(mode))
+
         self._falcon_connection_manager = FalconConnectionManager(self.mpstate)
 
         self.connect_falcon("169.254.128.221", 65101)  # 169.254.149.19 / 169.254.248.207
@@ -42,6 +51,7 @@ class FalconHILModule(mp_module.MPModule):
         self.add_command('falcon', self.cmd_falcon, "falcon commands",
                          ['status', 'set (LOGSETTING)', 'readsystem', 'wp'])
 
+    #TODO move it to background thread?
     def connect_falcon(self, host, port):
         try:
             print "Load falconhil module"
@@ -144,6 +154,22 @@ class FalconHILModule(mp_module.MPModule):
             else:
                 self.packets_othertarget += 1
 
+    ''' 
+        This method is used to generate HEARTBEAT packet that is going to send flightmode information for the image and the legend.
+        It takes custom_mode int values. For more mapping modes look at mode_mapping_acm in mavutil.py
+        default custom_mode 4 is GUIDED mode plotted in dark green
+        '''
+
+    def heartbeat_packet_for_mode(self, custom_mode=4):
+        try:
+            heartbeat_packet = common.MAVLink_heartbeat_message(mavutil.mavlink.MAV_TYPE_OCTOROTOR,
+                                                                mavutil.mavlink.MAV_AUTOPILOT_GENERIC,
+                                                                mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                                                                custom_mode, 0, 0)
+            heartbeat_packet.pack(self.mpstate.master().mav)
+            return heartbeat_packet
+        except:
+            print "heart beat packet generation failed"
 
 def init(mpstate):
     '''initialise module'''
