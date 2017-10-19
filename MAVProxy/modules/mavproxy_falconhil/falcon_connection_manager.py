@@ -12,7 +12,7 @@ import time, os
 import threading
 from falcon_util import FalconLogWriter
 from pymavlink import mavutil
-#import traceback
+
 
 class FalconConnectionManager:
 
@@ -39,8 +39,7 @@ class FalconConnectionManager:
                 print "create sdk vehicle"
                 self.__vehicle = sdk.Vehicle()
                 print "Connecting to Navigation Services @ %s:%d ...\n" % (serviceHost, servicePort)
-                # self.vehicle.createConnection(serviceHost, servicePort)
-                i = self.__vehicle.create_connection("169.254.248.207", 65101)  # 169.254.149.19
+                i = self.__vehicle.create_connection(serviceHost, servicePort)
                 if i == 0:
                     print("connected sdk")
                     self.__falcon_is_on = True
@@ -50,7 +49,7 @@ class FalconConnectionManager:
             else:
                 self.__vehicle = sdk.Vehicle()
 
-            # time.sleep(3)
+            time.sleep(3)
             # start thread to fetch status from SDK
             self.loop_thread = threading.Thread(target=self.read_vehicle_status, name='LoopThread')
             self.loop_thread.start()
@@ -87,9 +86,12 @@ class FalconConnectionManager:
                                                                                   0, self.hdg)
                 # dispatch MAVLink packet to other modules
                 self.dispatch_status_packet(globalPositionIntMsg)
+
                 globalPositionIntMsg.pack(self.mpstate.master().mav)
+
                 # Write in the log.
                 self.falconlog.hil_log(globalPositionIntMsg)
+
                 time.sleep(.3)
             except:
                 #traceback.print_exc()

@@ -31,26 +31,26 @@ class FalconWPHandler:
 
         if args[1] == "start_motor":
             print("###wp start_motor")
-            # self.__vehicle.mission_manager().start_motors()
+            self.__vehicle.mission_manager().start_motors()
         elif args[1] == "stop_motor":
             print("wp stop_motor")
-            # self.__vehicle.mission_manager().stop_motors()
+            self.__vehicle.mission_manager().stop_motors()
         elif args[1] == "start_flight":
             print("wp start_flight")
-            # self.__vehicle.mission_manager().start_fight()
+            self.__vehicle.mission_manager().start_flight()
         elif args[1] == "stop_flight":
             print("wp stop_flight")
-            # self.__vehicle.mission_manager().stop_fight()
+            self.__vehicle.mission_manager().stop_flight()
         elif args[1] == "pause_flight":
             print("wp pause_flight")
-            # self.__vehicle.mission_manager().pause_fight()
+            self.__vehicle.mission_manager().pause_flight()
         elif args[1] == "come_home":
             print("wp come_home")
-            # self.__vehicle.mission_manager().come_home()
+            self.__vehicle.mission_manager().come_home()
         elif args[1] == 'append_waypoint':
             print("##### handle_wp_commands: append_waypoint ", args[2])
             print args[2]
-            # self.__vehicle.mission_manager().append_waypoint(args[2])
+            self.__vehicle.mission_manager().append_waypoint(args[2])
         elif args[1] == 'load_mission':
             print("mission file is %s" % args[2])
             self.load_mission(args[2])
@@ -60,7 +60,7 @@ class FalconWPHandler:
             # self.mission_thread = threading.Thread(target=self.fly_mission, name='MissionThread')
             # self.mission_thread.start()
 
-            # self.__vehicle.mission_manager().fly_to_waypoint()
+            self.__vehicle.mission_manager().fly_to_waypoint()
 
     def load_mission(self, filename):
         try:
@@ -76,9 +76,9 @@ class FalconWPHandler:
                          if isinstance(literal_eval(p[y]), int) is True
                          else l.append(float(p[y]))]
                     print("######load_mission: append points list:", l)
-                    # self.__vehicle.mission_manager().append_waypoint(l)
+                    self.__vehicle.mission_manager().append_waypoint(l)
                 print("### load_mission: call start_fligh now")
-                # self.__vehicle.mission_manager().start_fight()
+                self.__vehicle.mission_manager().start_flight()
 
         except IOError as error:
             print("fly falcon mission failed")
@@ -93,8 +93,6 @@ class FalconWPHandler:
                     [l.append(int(p[y]))
                      if isinstance(literal_eval(p[y]), int) is True
                      else l.append(float(p[y]))]
-                # vehicle.mission_manager().append_waypoint(*l)
-                # vehicle.mission_manager().append_waypoint(l[0], l[1], l[2],
                 print("fly to point: ", l[0], l[1], l[2],
                                                           l[3], l[4], l[5],
                                                           l[6], l[7], l[8],
