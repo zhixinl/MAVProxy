@@ -70,7 +70,7 @@ class FalconHILModule(mp_module.MPModule):
             time.sleep(2)
             print "connected sdk"
             self.__running_sdk_loop = True
-            self.__wp_handler = FalconWPHandler(self.vehicle)
+            self.__wp_handler = FalconWPHandler(self.vehicle, self.mpstate)
         except:
             print "Failed to connect sdk"
 

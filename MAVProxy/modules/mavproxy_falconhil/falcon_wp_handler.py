@@ -14,13 +14,18 @@ import threading
 from ast import literal_eval
 import csv
 import sys
+import traceback
+
+from pymavlink.dialects.v10 import common
+from pymavlink import mavutil
 
 
 class FalconWPHandler:
     
-    def __init__(self, vehicle):
+    def __init__(self, vehicle, mpstate):
         print("create FalconWPHandler +++")
         self.__vehicle = vehicle
+        self.mpstate = mpstate
 
     def handle_wp_commands(self, args):
         print("###handle_wp_commands +++")
@@ -77,6 +82,8 @@ class FalconWPHandler:
                          else l.append(float(p[y]))]
                     print("######load_mission: append points list:", l)
                     self.__vehicle.mission_manager().append_waypoint(l)
+
+                    self.log_waypoint(l[1], l[0]-1, l[2], l[3], l[4], 0)
                 print("### load_mission: call start_fligh now")
                 self.__vehicle.mission_manager().start_flight()
 
@@ -104,3 +111,20 @@ class FalconWPHandler:
                                                           l[9], l[10],
                                                           l[11], l[12])
                 time.sleep(1.5)
+
+    def log_waypoint(self, wpType, seq, lat, lon, height, holdTime):
+        # Convert ACI way point data to MAVLink form, then create a MAVLink way point message and add it to our log
+        # Do we need to convert the lat, lon, height?
+        try:
+            frame = 3  # Can we deduce coordinate space from wpType, wpEvent, or flags?
+            command = 16  # Can we deduce command from wpType, wpEvent, or flags?
+            current = 0  # Can we deduce current from wpType, wpEvent, or flags?
+            autoContinue = 1  # Can we deduce autoContinue from wpType, wpEvent, or flags?
+
+            mission_packet = common.MAVLink_mission_item_message(255, 0, seq, frame, command, current, autoContinue,
+                                                                 0.0, 0.0, 0.0, 0.0, lat, lon, height)
+            mission_packet.pack(self.mpstate.master().mav)
+            self.mpstate.falconlog.hil_log(mission_packet)
+        except:
+            print "Failed to create the mission packet"
+            traceback.print_exc()
