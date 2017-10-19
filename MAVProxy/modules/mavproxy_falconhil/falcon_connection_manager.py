@@ -20,11 +20,18 @@ class FalconConnectionManager:
         print("FalconConnection __init__ +++")
         self.mpstate = mpstate
         self.__falcon_is_on = False
-        self._fake_data = False
-        self.logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
-        self.falconlog = FalconLogWriter(self.logpath)   # Open log 
-        self.mode = 4
-        self.falconlog.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
+        self._fake_data = True
+        # self.logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
+        # self.falconlog = FalconLogWriter(self.logpath)   # Open log
+        # self.mode = 4
+        # self.falconlog.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
+        # self.mpstate.falcon_logfile.hil_log(self.heartbeat_packet_for_mode(self.mode)) # Send a heartbeat packet with default mode of GUIDED.
+
+        logpath = os.path.join(self.mpstate.status.logdir, "falconlog.tlog")
+        self.mpstate.falconlog = FalconLogWriter(logpath)  # Open log
+        mode = 4
+        self.mpstate.falconlog.hil_log(
+            self.heartbeat_packet_for_mode(mode))  # Send a heartbeat packet with default mode of GUIDED.
 
         # TODO remove me
         if self._fake_data:
@@ -90,7 +97,8 @@ class FalconConnectionManager:
                 globalPositionIntMsg.pack(self.mpstate.master().mav)
 
                 # Write in the log.
-                self.falconlog.hil_log(globalPositionIntMsg)
+                # self.falconlog.hil_log(globalPositionIntMsg)
+                self.mpstate.falconlog.hil_log(globalPositionIntMsg)
 
                 time.sleep(.3)
             except:
