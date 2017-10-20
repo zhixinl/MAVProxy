@@ -434,8 +434,8 @@ class SlipTrail:
         if tnow >= self.last_time + self.timestep:
             self.points.append(newpos.latlon)
             self.last_time = tnow
-            while len(self.points) > self.count:
-                self.points.pop(0)
+            # while len(self.points) > self.count:
+            #     self.points.pop(0)
 
     def draw(self, img, pixmapper, bounds):
         '''draw the trail'''
