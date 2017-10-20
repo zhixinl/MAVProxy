@@ -20,7 +20,7 @@ class FalconConnectionManager:
         print("FalconConnection __init__ +++")
         self.mpstate = mpstate
         self.__falcon_is_on = False
-        self._fake_data = True
+        self._fake_data = False
 
         # TODO remove me
         if self._fake_data:

@@ -42,7 +42,7 @@ class FalconHILModule(mp_module.MPModule):
 
         self._falcon_connection_manager = FalconConnectionManager(self.mpstate)
 
-        self.connect_falcon("169.254.128.221", 65101)  # 169.254.149.19 / 169.254.248.207
+        self.connect_falcon("169.254.149.19", 65101)  # 169.254.149.19 / 169.254.248.207 / 169.254.128.221
 
         # add command
         self.FalconHILModule_settings = mp_settings.MPSettings(
