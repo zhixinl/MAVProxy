@@ -1,18 +1,15 @@
 #!/usr/bin/env python
-'''
+"""
 FalconHIL Module utility file.  
 
 FalconLogWriter class contains functionality to write in log.
+"""
 
-'''
-
-import sys
-from pymavlink import mavutil
 import threading
 import time
-import Queue, struct
-from pymavlink.dialects.v10 import common
-#import traceback
+import Queue
+import struct
+import traceback
 
 
 class FalconLogWriter:
@@ -23,20 +20,16 @@ class FalconLogWriter:
         self.hil_logqueue = Queue.Queue()
         try:
             mode = 'w'
-            #TODO: change this to user defined value
-            #falcon_logpath = "/home/deepticl/development/simulation/buildlogs/ArduCopter-test-map.tlog"
-            
             self.falcon_logfile = open(falcon_logpath, mode=mode)
             print("Log File: %s" % falcon_logpath)
             
-            # Use a separate thread for writing to the logfile to prevent
-            # delays during disk writes
+            # Use a separate thread for writing to the logfile to prevent delays during disk writes
             t = threading.Thread(target=self.hil_logwriter, name='hil_logwriter')
             t.daemon = True
             t.start()
         except Exception as e:
             print("ERROR: opening log file for writing: %s" % e)
-            #traceback.print_exc()
+            traceback.print_exc()
 
 
     def hil_logwriter(self):
