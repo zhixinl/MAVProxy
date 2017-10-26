@@ -31,9 +31,8 @@ class FalconLogWriter:
             print("ERROR: opening log file for writing: %s" % e)
             traceback.print_exc()
 
-
     def hil_logwriter(self):
-        '''log writing thread'''
+        """log writing thread"""
         while True:
             timeout = time.time() + 10
             while not self.hil_logqueue.empty() and time.time() < timeout:
@@ -41,11 +40,11 @@ class FalconLogWriter:
             self.falcon_logfile.flush()
             time.sleep(0.05)
 
-                
-    def get_usec(self):
-        '''time since 1970 in microseconds'''
+    @staticmethod
+    def get_usec():
+        """time since 1970 in microseconds"""
         return int(time.time() * 1.0e6)
-                            
+
     def hil_log(self, m):
         #print "******"
         #print "in hil_log, m is: "
