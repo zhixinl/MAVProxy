@@ -421,7 +421,7 @@ class SlipThumbnail(SlipObject):
 
 class SlipTrail:
     '''trail information for a moving icon'''
-    def __init__(self, timestep=0.2, colour=(255,255,0), count=60, points=[]):
+    def __init__(self, timestep=0.2, colour=(255,255,0), count=20000, points=[]):
         self.timestep = timestep
         self.colour = colour
         self.count = count
@@ -434,8 +434,8 @@ class SlipTrail:
         if tnow >= self.last_time + self.timestep:
             self.points.append(newpos.latlon)
             self.last_time = tnow
-            # while len(self.points) > self.count:
-            #     self.points.pop(0)
+            while len(self.points) > self.count:
+                self.points.pop(0)
 
     def draw(self, img, pixmapper, bounds):
         '''draw the trail'''

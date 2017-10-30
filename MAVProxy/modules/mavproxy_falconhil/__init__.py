@@ -26,7 +26,7 @@ class FalconHILModule(mp_module.MPModule):
         self.status_callcount = 0
         self.boredom_interval = 10  # seconds
         self.last_bored = time.time()
-
+        self.mpstate.sim_start_time_sec = time.time() # Using this for the SYSTEM_TIME packet for results computation
         self.packets_mytarget = 0
         self.packets_othertarget = 0
         self.verbose = False

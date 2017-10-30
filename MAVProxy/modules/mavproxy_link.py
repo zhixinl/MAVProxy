@@ -454,8 +454,10 @@ class LinkModule(mp_module.MPModule):
             # GCS
             if self.mpstate.settings.mavfwd_rate or mtype != 'REQUEST_DATA_STREAM':
                 if not mtype in self.no_fwd_types:
+                    '''
                     for r in self.mpstate.mav_outputs:
                         r.write(m.get_msgbuf())
+                    '''
 
             # pass to modules
             for (mod,pm) in self.mpstate.modules:
