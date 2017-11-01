@@ -49,12 +49,13 @@ class FenceModule(mp_module.MPModule):
 
     def idle_task(self):
         '''called on idle'''
-        if self.module('console') is not None and not self.menu_added_console:
-            self.menu_added_console = True
-            self.module('console').add_menu(self.menu)
-        if self.module('map') is not None and not self.menu_added_map:
-            self.menu_added_map = True
-            self.module('map').add_menu(self.menu)
+        pass
+        # if self.module('console') is not None and not self.menu_added_console:
+        #     self.menu_added_console = True
+        #     self.module('console').add_menu(self.menu)
+        # if self.module('map') is not None and not self.menu_added_map:
+        #     self.menu_added_map = True
+        #     self.module('map').add_menu(self.menu)
 
     def mavlink_packet(self, m):
         '''handle and incoming mavlink packet'''
