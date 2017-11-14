@@ -75,7 +75,10 @@ class FalconWPHandler:
                 print("read csv successfully")
                 for row in reader:
                     l = []
-                    p = [x for x in row[0].split(',')]
+                    if(not row == []):
+                        p = [x for x in row[0].split(',')]
+                    else:
+                        continue
                     for y in range(len(p)):
                         [l.append(int(p[y]))
                          if isinstance(literal_eval(p[y]), int) is True
